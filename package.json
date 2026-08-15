@@ -1,0 +1,8 @@
+{
+  "name": "resume-gap-analysis",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}

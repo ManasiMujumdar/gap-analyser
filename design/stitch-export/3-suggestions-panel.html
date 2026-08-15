@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gap Check - Suggestions Panel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#b9c7df",
+                        "on-tertiary-fixed": "#281901",
+                        "inverse-surface": "#303032",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#574325",
+                        "primary": "#303e51",
+                        "on-surface-variant": "#44474c",
+                        "tertiary": "#4d3a1c",
+                        "gap-mid": "#BAE6FD",
+                        "on-background": "#1b1b1d",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#665131",
+                        "bg-subtle": "#F8FAFC",
+                        "outline-variant": "#c4c6cd",
+                        "surface-bright": "#fbf9fa",
+                        "tertiary-fixed": "#fcdeb4",
+                        "secondary": "#006591",
+                        "primary-fixed": "#d5e3fc",
+                        "inverse-on-surface": "#f2f0f2",
+                        "on-secondary-container": "#004666",
+                        "gap-high": "#FDE68A",
+                        "primary-container": "#475569",
+                        "surface-variant": "#e4e2e3",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#001e2f",
+                        "surface-container-high": "#eae7e9",
+                        "border-soft": "#F1F5F9",
+                        "inverse-primary": "#b9c7df",
+                        "surface-tint": "#515f74",
+                        "surface-container": "#efedef",
+                        "secondary-fixed": "#c9e6ff",
+                        "surface-dim": "#dbd9db",
+                        "surface-container-low": "#f5f3f5",
+                        "secondary-container": "#39b8fd",
+                        "on-primary-container": "#bbcae1",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#89ceff",
+                        "on-primary-fixed-variant": "#3a485b",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "outline": "#75777d",
+                        "surface": "#fbf9fa",
+                        "success-muted": "#14B8A6",
+                        "on-secondary-fixed-variant": "#004c6e",
+                        "on-surface": "#1b1b1d",
+                        "on-tertiary-container": "#e2c59d",
+                        "tertiary-fixed-dim": "#dfc29a",
+                        "background": "#fbf9fa",
+                        "gap-low": "#E2E8F0",
+                        "surface-container-highest": "#e4e2e3",
+                        "on-primary-fixed": "#0d1c2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "container-max": "1120px",
+                        "margin-mobile": "16px",
+                        "card-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Public Sans"],
+                        "headline-lg": ["Public Sans"],
+                        "headline-sm": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "label-sm": ["Public Sans"],
+                        "body-lg": ["Public Sans"],
+                        "label-md": ["Public Sans"],
+                        "headline-lg-mobile": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["10px", { "lineHeight": "12px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[style*="'FILL' 1"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Glassmorphism Slide-over */
+        .glass-overlay {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background-color: rgba(248, 250, 252, 0.4);
+        }
+
+        /* Subtle Depth Stepper Animation */
+        .stepper-fill {
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-sans antialiased flex h-screen overflow-hidden">
+<!-- Top Navigation (Desktop) -->
+<header class="fixed top-0 left-0 right-0 z-40 bg-background dark:bg-background h-16 border-b-0 hidden md:block">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-16">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Gap Check</div>
+<nav class="flex gap-gutter">
+<a class="text-on-surface-variant dark:text-on-surface-variant pb-1 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors cursor-pointer active:opacity-80 font-label-md text-label-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant pb-1 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors cursor-pointer active:opacity-80 font-label-md text-label-md" href="#">Resume Versions</a>
+<a class="text-secondary dark:text-secondary-container border-b-2 border-secondary dark:border-secondary-container pb-1 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors cursor-pointer active:opacity-80 font-label-md text-label-md" href="#">Guidance</a>
+</nav>
+<div class="flex gap-stack-gap items-center">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors" data-icon="settings">settings</span>
+<img alt="User profile" class="w-8 h-8 rounded-full bg-surface-variant object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZThNhxdXW7qWwa6sRV1vTHurV1NIWZi7OdwAwXawSD1XjNxJEFUCkPSDM1J4X0t_xD9RGZxwQc7HhLV1u9UbW7fRv9efwwwVDbccIZqQs1o2jJ0BOgafz2yXQmLllQjhKndrbZ6COWrzx2IG3OWa9UfWdCbaxOVKOj_zfmHMdpsZA2Bb7pgp678yz31OZcDngXdlLQQb0vowas6jgVaRIwdasiiMw6YH-dOuonYWVPcp4KR1aLcES7A"/>
+</div>
+</div>
+</header>
+<!-- Side Navigation (Desktop) -->
+<aside class="hidden lg:flex flex-col h-screen p-gutter fixed left-0 w-64 border-r border-border-soft dark:border-outline-variant bg-surface dark:bg-surface-container-low z-30 pt-24">
+</aside>
+<!-- Main Canvas (Background Content to show Slide-over context) -->
+<main class="flex-1 overflow-y-auto pt-16 lg:pl-64 h-full relative z-0">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 opacity-50 pointer-events-none transition-opacity duration-300" id="main-content">
+<h1 class="font-headline-lg text-headline-lg text-primary mb-8">Career Guidance</h1>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="bg-surface rounded-lg p-card-padding border border-border-soft h-64"></div>
+<div class="bg-surface rounded-lg p-card-padding border border-border-soft h-64"></div>
+</div>
+</div>
+</main>
+<!-- Slide-over Overlay & Panel -->
+<div aria-labelledby="slide-over-title" aria-modal="true" class="fixed inset-0 z-50 flex justify-end" role="dialog">
+<!-- Background Overlay with Glassmorphism -->
+<div aria-hidden="true" class="absolute inset-0 glass-overlay transition-opacity"></div>
+<!-- Slide-over Panel -->
+<div class="relative w-full max-w-2xl bg-surface h-full shadow-2xl flex flex-col transform transition-transform duration-500 ease-in-out translate-x-0 border-l border-border-soft">
+<!-- Header -->
+<div class="px-card-padding py-6 border-b border-border-soft bg-surface flex flex-col shrink-0">
+<div class="flex items-start justify-between mb-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary" id="slide-over-title">Product Strategy</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Target Role: Senior Product Manager</p>
+</div>
+<button class="rounded-full p-2 text-on-surface-variant hover:bg-bg-subtle transition-colors focus:outline-none focus:ring-2 focus:ring-secondary" type="button">
+<span class="sr-only">Close panel</span>
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Depth Stepper: Job Wants vs Your Resume -->
+<div class="mt-4 bg-bg-subtle rounded-lg p-4 border border-border-soft flex flex-col gap-4">
+<!-- Job Wants -->
+<div class="flex items-center gap-4">
+<span class="font-label-md text-label-md text-on-surface-variant w-24">Job Wants:</span>
+<div class="flex-1 flex gap-1 h-2 relative rounded-full overflow-hidden bg-gap-low">
+<div class="h-full bg-secondary w-full rounded-full absolute top-0 left-0 z-10" title="Led"></div>
+</div>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold w-16 text-right">Led</span>
+</div>
+<!-- Your Resume Shows -->
+<div class="flex items-center gap-4">
+<span class="font-label-md text-label-md text-on-surface-variant w-24">You Show:</span>
+<div class="flex-1 flex gap-1 h-2 relative rounded-full overflow-hidden bg-gap-low">
+<div class="h-full bg-gap-mid w-1/2 rounded-full absolute top-0 left-0 z-10 stepper-fill" title="Used"></div>
+</div>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold w-16 text-right">Used</span>
+</div>
+</div>
+</div>
+<!-- Scrollable Content: Action Cards -->
+<div class="flex-1 overflow-y-auto p-card-padding flex flex-col gap-gutter bg-background">
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">Here are supportive ways to bridge this gap, ordered by effort. Choose the approach that best fits your timeline.</p>
+<!-- Card 1: Quick Win (Rewrite) -->
+<div class="bg-surface rounded-xl p-card-padding border border-border-soft shadow-sm relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-success-muted"></div>
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-success-muted" data-icon="edit_note">edit_note</span>
+<h3 class="font-headline-sm text-headline-sm text-primary">Rewrite your resume</h3>
+</div>
+<span class="bg-bg-subtle text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-full border border-border-soft">Quick Win</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">You have the experience, it's just not positioned strongly enough. Try updating an existing bullet point to focus on strategic impact rather than just execution.</p>
+<div class="bg-bg-subtle rounded-lg p-4 border border-border-soft relative group-hover:shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-shadow">
+<p class="font-body-md text-body-md italic text-primary">"Led cross-functional teams to define and execute the product roadmap, resulting in a 20% increase in user engagement over Q3."</p>
+<button aria-label="Copy proposed text" class="absolute top-2 right-2 p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface rounded transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="content_copy">content_copy</span>
+</button>
+</div>
+</div>
+<!-- Card 2: Medium Effort (Build) -->
+<div class="bg-surface rounded-xl p-card-padding border border-border-soft shadow-sm relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="construction">construction</span>
+<h3 class="font-headline-sm text-headline-sm text-primary">Build something to show it</h3>
+</div>
+<div class="flex items-center gap-1 bg-gap-mid/30 text-on-secondary-container font-label-sm text-label-sm px-2 py-1 rounded-full border border-gap-mid">
+<span class="material-symbols-outlined text-[14px]" data-icon="timer">timer</span>
+<span>Takes Time</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">If you need more concrete examples of product strategy, consider developing a brief spec or teardown for a hypothetical feature.</p>
+<div class="flex gap-4 items-start">
+<div class="w-12 h-12 rounded bg-bg-subtle border border-border-soft flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-outline" data-icon="design_services">design_services</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-primary mb-1">Create a 1-Page Strategy Document</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Draft a PRD (Product Requirements Document) for a tool you use daily. Focus on the "Why" and the expected business outcomes. Attach this as a portfolio piece.</p>
+</div>
+</div>
+</div>
+<!-- Card 3: Deep Dive (Talk about it / STAR) -->
+<div class="bg-surface rounded-xl p-card-padding border border-border-soft shadow-sm relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-tertiary-container"></div>
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-container" data-icon="record_voice_over">record_voice_over</span>
+<h3 class="font-headline-sm text-headline-sm text-primary">How to talk about it</h3>
+</div>
+<span class="bg-bg-subtle text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-full border border-border-soft">Interview Prep</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">Structure your past experience using the STAR method to clearly demonstrate your strategic capabilities during interviews.</p>
+<!-- STAR Mini-Timeline -->
+<div class="relative pl-6 space-y-6 before:absolute before:inset-y-0 before:left-[11px] before:w-[2px] before:bg-border-soft">
+<!-- Situation -->
+<div class="relative">
+<div class="absolute -left-6 w-3 h-3 rounded-full bg-surface border-2 border-tertiary-container mt-1.5"></div>
+<h4 class="font-label-md text-label-md text-primary mb-1">Situation</h4>
+<p class="font-body-md text-body-md text-on-surface-variant bg-bg-subtle p-3 rounded-lg border border-border-soft">"At my previous role, we were losing market share to a new competitor because our feature set was outdated."</p>
+</div>
+<!-- Task -->
+<div class="relative">
+<div class="absolute -left-6 w-3 h-3 rounded-full bg-surface border-2 border-tertiary-container mt-1.5"></div>
+<h4 class="font-label-md text-label-md text-primary mb-1">Task</h4>
+<p class="font-body-md text-body-md text-on-surface-variant bg-bg-subtle p-3 rounded-lg border border-border-soft">"I needed to redefine our product strategy for Q3 to regain user trust without halting ongoing development."</p>
+</div>
+<!-- Action -->
+<div class="relative">
+<div class="absolute -left-6 w-3 h-3 rounded-full bg-surface border-2 border-tertiary-container mt-1.5"></div>
+<h4 class="font-label-md text-label-md text-primary mb-1">Action</h4>
+<p class="font-body-md text-body-md text-on-surface-variant bg-bg-subtle p-3 rounded-lg border border-border-soft">"I analyzed competitor gaps, aligned engineering and marketing on three core strategic pillars, and phased the rollout."</p>
+</div>
+<!-- Result -->
+<div class="relative">
+<div class="absolute -left-6 w-3 h-3 rounded-full bg-tertiary-container mt-1.5 shadow-[0_0_0_4px_rgba(252,222,180,0.4)]"></div>
+<h4 class="font-label-md text-label-md text-primary mb-1">Result</h4>
+<p class="font-body-md text-body-md text-on-surface-variant bg-bg-subtle p-3 rounded-lg border border-border-soft">"We stabilized churn within two months and saw a 15% uptick in feature adoption, proving the new strategic direction."</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="p-card-padding border-t border-border-soft bg-surface mt-auto shrink-0 flex justify-end gap-4">
+<button class="px-4 py-2 font-label-md text-label-md text-on-surface-variant border border-outline-variant rounded hover:bg-bg-subtle transition-colors">Mark as Reviewed</button>
+<button class="px-4 py-2 font-label-md text-label-md text-on-primary bg-secondary rounded hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-sm">Save to Action Plan</button>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gap Check - Gap Report</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Public Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#b9c7df",
+                        "on-tertiary-fixed": "#281901",
+                        "inverse-surface": "#303032",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#574325",
+                        "primary": "#303e51",
+                        "on-surface-variant": "#44474c",
+                        "tertiary": "#4d3a1c",
+                        "gap-mid": "#BAE6FD",
+                        "on-background": "#1b1b1d",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#665131",
+                        "bg-subtle": "#F8FAFC",
+                        "outline-variant": "#c4c6cd",
+                        "surface-bright": "#fbf9fa",
+                        "tertiary-fixed": "#fcdeb4",
+                        "secondary": "#006591",
+                        "primary-fixed": "#d5e3fc",
+                        "inverse-on-surface": "#f2f0f2",
+                        "on-secondary-container": "#004666",
+                        "gap-high": "#FDE68A",
+                        "primary-container": "#475569",
+                        "surface-variant": "#e4e2e3",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#001e2f",
+                        "surface-container-high": "#eae7e9",
+                        "border-soft": "#F1F5F9",
+                        "inverse-primary": "#b9c7df",
+                        "surface-tint": "#515f74",
+                        "surface-container": "#efedef",
+                        "secondary-fixed": "#c9e6ff",
+                        "surface-dim": "#dbd9db",
+                        "surface-container-low": "#f5f3f5",
+                        "secondary-container": "#39b8fd",
+                        "on-primary-container": "#bbcae1",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#89ceff",
+                        "on-primary-fixed-variant": "#3a485b",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "outline": "#75777d",
+                        "surface": "#fbf9fa",
+                        "success-muted": "#14B8A6",
+                        "on-secondary-fixed-variant": "#004c6e",
+                        "on-surface": "#1b1b1d",
+                        "on-tertiary-container": "#e2c59d",
+                        "tertiary-fixed-dim": "#dfc29a",
+                        "background": "#fbf9fa",
+                        "gap-low": "#E2E8F0",
+                        "surface-container-highest": "#e4e2e3",
+                        "on-primary-fixed": "#0d1c2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "container-max": "1120px",
+                        "margin-mobile": "16px",
+                        "card-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Public Sans"],
+                        "headline-lg": ["Public Sans"],
+                        "headline-sm": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "label-sm": ["Public Sans"],
+                        "body-lg": ["Public Sans"],
+                        "label-md": ["Public Sans"],
+                        "headline-lg-mobile": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["10px", { "lineHeight": "12px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .expandable-content.expanded {
+            max-height: 500px; /* Arbitrary large value */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg min-h-screen flex flex-col md:flex-row antialiased">
+<!-- Mobile Top App Bar (Hidden on md and up) -->
+<header class="md:hidden bg-background border-b border-border-soft flex justify-between items-center w-full px-margin-mobile mx-auto h-16 sticky top-0 z-50">
+<div class="font-headline-sm text-headline-sm font-bold text-primary">Gap Check</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:opacity-80" data-icon="notifications" style="font-variation-settings: 'FILL' 0;">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:opacity-80" data-icon="settings" style="font-variation-settings: 'FILL' 0;">settings</span>
+</div>
+</header>
+<!-- SideNavBar (Hidden on Mobile, visible on lg) -->
+<nav class="hidden lg:flex flex-col h-screen p-gutter fixed left-0 w-64 border-r border-border-soft bg-surface z-40">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 rounded-lg bg-primary-fixed-dim flex items-center justify-center text-primary font-bold">GC</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Gap Check</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Career Growth Partner</p>
+</div>
+</div>
+<button class="w-full py-2 px-4 bg-secondary text-on-primary rounded-lg font-label-md text-label-md mb-8 hover:bg-secondary-container transition-colors">New Analysis</button>
+<ul class="flex-1 space-y-2">
+<!-- Active Tab: Gap Report -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary font-bold hover:bg-bg-subtle transition-all duration-200 scale-98 active:scale-95 bg-bg-subtle" href="#">
+<span class="material-symbols-outlined" data-icon="analytics" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-md text-label-md">Gap Report</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all duration-200 scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="upload_file" style="font-variation-settings: 'FILL' 0;">upload_file</span>
+<span class="font-label-md text-label-md">Upload Resume</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all duration-200 scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="history" style="font-variation-settings: 'FILL' 0;">history</span>
+<span class="font-label-md text-label-md">Timeline</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all duration-200 scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="psychology" style="font-variation-settings: 'FILL' 0;">psychology</span>
+<span class="font-label-md text-label-md">Coaching</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto pt-4 border-t border-border-soft">
+<ul class="space-y-2">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all duration-200 scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline" style="font-variation-settings: 'FILL' 0;">help_outline</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all duration-200 scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 w-full lg:ml-64 p-margin-mobile md:p-gutter lg:p-margin-desktop max-w-container-max mx-auto overflow-y-auto custom-scrollbar">
+<!-- Page Header -->
+<div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-1">Senior Cloud Architect</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">business</span> TechNova Solutions
+                </p>
+</div>
+<div class="flex items-center gap-3">
+<div class="px-3 py-1.5 bg-bg-subtle border border-border-soft rounded-full font-label-md text-label-md text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+                    Resume v2 of 2
+                </div>
+</div>
+</div>
+<!-- Content Grid (Bento style approach for cards) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-stack-gap">
+<!-- Skill Cards Column -->
+<div class="md:col-span-8 lg:col-span-8 flex flex-col gap-stack-gap">
+<!-- Skill Card 1: Major Gap -->
+<article class="bg-surface-container-lowest border border-border-soft rounded-lg p-card-padding relative overflow-hidden group hover:shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-shadow">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-1">Distributed Systems Design</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Core requirement for architectural roles.</p>
+</div>
+<div class="px-3 py-1 bg-gap-high rounded-full font-label-md text-label-md text-on-tertiary-fixed flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                            Major Gap
+                        </div>
+</div>
+<!-- Depth Stepper -->
+<div class="space-y-4 mb-6">
+<div class="flex items-center gap-4">
+<span class="w-24 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Job Wants</span>
+<div class="flex-1 flex gap-1 h-3">
+<div class="flex-1 bg-secondary rounded-l-full"></div>
+<div class="flex-1 bg-secondary"></div>
+<div class="flex-1 bg-secondary"></div>
+<div class="flex-1 bg-secondary rounded-r-full"></div>
+</div>
+<span class="w-12 text-right font-label-sm text-label-sm text-secondary font-bold">LED</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-24 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Your Resume</span>
+<div class="flex-1 flex gap-1 h-3">
+<div class="flex-1 bg-primary-container rounded-l-full"></div>
+<div class="flex-1 bg-primary-container"></div>
+<div class="flex-1 bg-surface-variant"></div>
+<div class="flex-1 bg-surface-variant rounded-r-full"></div>
+</div>
+<span class="w-12 text-right font-label-sm text-label-sm text-primary-container font-bold">USED</span>
+</div>
+</div>
+<!-- Expandable Quote Section -->
+<div class="border-t border-border-soft pt-4">
+<button class="flex items-center gap-2 text-secondary font-label-md text-label-md hover:text-secondary-container transition-colors w-full text-left" onclick="this.nextElementSibling.classList.toggle('expanded')">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                            Why is this a gap?
+                         </button>
+<div class="expandable-content mt-2">
+<div class="bg-bg-subtle p-3 rounded-md border border-border-soft">
+<p class="font-body-md text-body-md italic text-on-surface-variant border-l-2 border-gap-high pl-3">
+                                    JD states: "Must have proven experience leading the architecture of large-scale distributed systems." Your resume mentions working with microservices, but lacks examples of architectural ownership.
+                                </p>
+<div class="mt-3 flex justify-end">
+<button class="px-4 py-1.5 border border-secondary text-secondary rounded-md font-label-md text-label-md hover:bg-secondary hover:text-on-primary transition-colors">View Suggestions</button>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Skill Card 2: Minor Gap -->
+<article class="bg-surface-container-lowest border border-border-soft rounded-lg p-card-padding relative overflow-hidden group hover:shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-shadow">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-1">Kubernetes / Container Orchestration</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Required for deployment strategy.</p>
+</div>
+<div class="px-3 py-1 bg-gap-mid rounded-full font-label-md text-label-md text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">remove</span>
+                            Minor Gap
+                        </div>
+</div>
+<!-- Depth Stepper -->
+<div class="space-y-4 mb-6">
+<div class="flex items-center gap-4">
+<span class="w-24 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Job Wants</span>
+<div class="flex-1 flex gap-1 h-3">
+<div class="flex-1 bg-secondary rounded-l-full"></div>
+<div class="flex-1 bg-secondary"></div>
+<div class="flex-1 bg-secondary"></div>
+<div class="flex-1 bg-surface-variant rounded-r-full"></div>
+</div>
+<span class="w-12 text-right font-label-sm text-label-sm text-secondary font-bold">OWNED</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-24 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Your Resume</span>
+<div class="flex-1 flex gap-1 h-3">
+<div class="flex-1 bg-primary-container rounded-l-full"></div>
+<div class="flex-1 bg-primary-container"></div>
+<div class="flex-1 bg-surface-variant"></div>
+<div class="flex-1 bg-surface-variant rounded-r-full"></div>
+</div>
+<span class="w-12 text-right font-label-sm text-label-sm text-primary-container font-bold">USED</span>
+</div>
+</div>
+<!-- Expandable Quote Section -->
+<div class="border-t border-border-soft pt-4">
+<button class="flex items-center gap-2 text-secondary font-label-md text-label-md hover:text-secondary-container transition-colors w-full text-left" onclick="this.nextElementSibling.classList.toggle('expanded')">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                            Why is this a gap?
+                         </button>
+<div class="expandable-content mt-2">
+<div class="bg-bg-subtle p-3 rounded-md border border-border-soft">
+<p class="font-body-md text-body-md italic text-on-surface-variant border-l-2 border-gap-mid pl-3">
+                                    You mention Docker, but explicit experience managing clusters with Kubernetes is requested. Consider highlighting specific K8s projects if applicable.
+                                </p>
+<div class="mt-3 flex justify-end">
+<button class="px-4 py-1.5 border border-secondary text-secondary rounded-md font-label-md text-label-md hover:bg-secondary hover:text-on-primary transition-colors">View Suggestions</button>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Skill Card 3: On Track -->
+<article class="bg-surface-container-lowest border border-border-soft rounded-lg p-card-padding relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-1">AWS Cloud Infrastructure</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Primary cloud provider requirement.</p>
+</div>
+<div class="flex items-center gap-1 text-success-muted font-label-md text-label-md">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+                            On Track
+                        </div>
+</div>
+<!-- Depth Stepper -->
+<div class="space-y-4 mb-4">
+<div class="flex items-center gap-4">
+<span class="w-24 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Job Wants</span>
+<div class="flex-1 flex gap-1 h-3">
+<div class="flex-1 bg-secondary rounded-l-full"></div>
+<div class="flex-1 bg-secondary"></div>
+<div class="flex-1 bg-secondary"></div>
+<div class="flex-1 bg-surface-variant rounded-r-full"></div>
+</div>
+<span class="w-12 text-right font-label-sm text-label-sm text-secondary font-bold">OWNED</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="w-24 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Your Resume</span>
+<div class="flex-1 flex gap-1 h-3">
+<div class="flex-1 bg-success-muted rounded-l-full opacity-80"></div>
+<div class="flex-1 bg-success-muted opacity-80"></div>
+<div class="flex-1 bg-success-muted opacity-80"></div>
+<div class="flex-1 bg-success-muted rounded-r-full opacity-80"></div>
+</div>
+<span class="w-12 text-right font-label-sm text-label-sm text-success-muted font-bold">LED</span>
+</div>
+</div>
+</article>
+</div>
+<!-- Context / Info Sidebar (Bento grid right column) -->
+<div class="md:col-span-4 lg:col-span-4 flex flex-col gap-stack-gap">
+<!-- Summary Card -->
+<div class="bg-bg-subtle border border-border-soft rounded-lg p-card-padding">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-4">Analysis Summary</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center border-b border-border-soft pb-2">
+<span class="font-body-md text-body-md text-on-surface-variant">Overall Match</span>
+<span class="font-headline-sm text-headline-sm text-primary">78%</span>
+</div>
+<div class="flex justify-between items-center border-b border-border-soft pb-2">
+<span class="font-body-md text-body-md text-on-surface-variant">Major Gaps</span>
+<span class="font-body-md text-body-md text-gap-high font-bold px-2 py-0.5 bg-tertiary-container rounded">2</span>
+</div>
+<div class="flex justify-between items-center pb-2">
+<span class="font-body-md text-body-md text-on-surface-variant">Minor Gaps</span>
+<span class="font-body-md text-body-md text-primary font-bold px-2 py-0.5 bg-gap-mid rounded">4</span>
+</div>
+</div>
+<button class="w-full mt-6 py-2 px-4 border border-secondary text-secondary rounded-lg font-label-md text-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-colors">Download PDF Report</button>
+</div>
+<!-- Decorative element or illustration placeholder -->
+<div class="bg-surface-container-lowest border border-border-soft rounded-lg overflow-hidden h-48 relative flex items-center justify-center p-4">
+<p class="font-body-md text-body-md text-on-surface-variant text-center relative z-10">
+                         "Growth is never by mere chance; it is the result of forces working together."
+                     </p>
+<div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#303e51 1px, transparent 1px); background-size: 20px 20px;"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Navigation (Hidden on md and up) -->
+<nav class="md:hidden fixed bottom-0 w-full bg-surface border-t border-border-soft flex justify-around items-center h-16 z-50">
+<a class="flex flex-col items-center gap-1 text-primary p-2" href="#">
+<span class="material-symbols-outlined" data-icon="analytics" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-sm text-label-sm">Report</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined" data-icon="upload_file" style="font-variation-settings: 'FILL' 0;">upload_file</span>
+<span class="font-label-sm text-label-sm">Upload</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined" data-icon="history" style="font-variation-settings: 'FILL' 0;">history</span>
+<span class="font-label-sm text-label-sm">Timeline</span>
+</a>
+</nav>
+</body></html>

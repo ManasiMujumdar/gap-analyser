@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gap Check - Resume Versions</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#ffffff",
+                      "primary-fixed-dim": "#b9c7df",
+                      "on-tertiary-fixed": "#281901",
+                      "inverse-surface": "#303032",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed-variant": "#574325",
+                      "primary": "#303e51",
+                      "on-surface-variant": "#44474c",
+                      "tertiary": "#4d3a1c",
+                      "gap-mid": "#BAE6FD",
+                      "on-background": "#1b1b1d",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-container": "#665131",
+                      "bg-subtle": "#F8FAFC",
+                      "outline-variant": "#c4c6cd",
+                      "surface-bright": "#fbf9fa",
+                      "tertiary-fixed": "#fcdeb4",
+                      "secondary": "#006591",
+                      "primary-fixed": "#d5e3fc",
+                      "inverse-on-surface": "#f2f0f2",
+                      "on-secondary-container": "#004666",
+                      "gap-high": "#FDE68A",
+                      "primary-container": "#475569",
+                      "surface-variant": "#e4e2e3",
+                      "error-container": "#ffdad6",
+                      "on-secondary-fixed": "#001e2f",
+                      "surface-container-high": "#eae7e9",
+                      "border-soft": "#F1F5F9",
+                      "inverse-primary": "#b9c7df",
+                      "surface-tint": "#515f74",
+                      "surface-container": "#efedef",
+                      "secondary-fixed": "#c9e6ff",
+                      "surface-dim": "#dbd9db",
+                      "surface-container-low": "#f5f3f5",
+                      "secondary-container": "#39b8fd",
+                      "on-primary-container": "#bbcae1",
+                      "on-error": "#ffffff",
+                      "secondary-fixed-dim": "#89ceff",
+                      "on-primary-fixed-variant": "#3a485b",
+                      "error": "#ba1a1a",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "outline": "#75777d",
+                      "surface": "#fbf9fa",
+                      "success-muted": "#14B8A6",
+                      "on-secondary-fixed-variant": "#004c6e",
+                      "on-surface": "#1b1b1d",
+                      "on-tertiary-container": "#e2c59d",
+                      "tertiary-fixed-dim": "#dfc29a",
+                      "background": "#fbf9fa",
+                      "gap-low": "#E2E8F0",
+                      "surface-container-highest": "#e4e2e3",
+                      "on-primary-fixed": "#0d1c2e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-gap": "16px",
+                      "gutter": "24px",
+                      "margin-desktop": "40px",
+                      "container-max": "1120px",
+                      "margin-mobile": "16px",
+                      "card-padding": "24px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Public Sans"],
+                      "headline-lg": ["Public Sans"],
+                      "headline-sm": ["Public Sans"],
+                      "body-md": ["Public Sans"],
+                      "label-sm": ["Public Sans"],
+                      "body-lg": ["Public Sans"],
+                      "label-md": ["Public Sans"],
+                      "headline-lg-mobile": ["Public Sans"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-sm": ["10px", {"lineHeight": "12px", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["26px", {"lineHeight": "32px", "fontWeight": "700"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .timeline-line {
+            width: 2px;
+            background-color: #F1F5F9; /* border-soft */
+            position: absolute;
+            left: 23px; /* Center of the 48px circle */
+            top: 48px;
+            bottom: -32px;
+            z-index: 0;
+        }
+        .timeline-node {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            border: 2px solid #F1F5F9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            position: relative;
+        }
+        .timeline-node.active {
+            border-color: #006591; /* secondary */
+            background-color: #F8FAFC; /* bg-subtle */
+        }
+        .expandable-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .expandable-content.expanded {
+            display: block;
+            opacity: 1;
+        }
+        .chip {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-family: 'Public Sans';
+            font-size: 12px;
+            line-height: 16px;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .chip-positive {
+            background-color: #e6f6f4; /* Light success-muted */
+            color: #0f8a7c;
+        }
+        .chip-neutral {
+            background-color: #F8FAFC;
+            color: #44474c;
+            border: 1px solid #F1F5F9;
+        }
+        .chip-negative {
+            background-color: #fffbeb; /* Light gap-high */
+            color: #92400e;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar (Hidden on Mobile, Flex on LG) -->
+<nav class="hidden lg:flex flex-col h-screen p-gutter fixed left-0 border-r border-border-soft bg-surface w-64 z-50">
+<div class="mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary text-on-primary flex items-center justify-center font-bold font-headline-sm text-headline-sm">
+                GC
+            </div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Gap Check</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Career Growth Partner</p>
+</div>
+</div>
+<button class="w-full py-3 px-4 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md mb-8 flex items-center justify-center gap-2 hover:bg-opacity-90 transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+            New Analysis
+        </button>
+<ul class="flex flex-col gap-2 flex-grow">
+<li>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                    Gap Report
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">upload_file</span>
+                    Upload Resume
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 p-3 rounded-lg text-primary font-bold bg-bg-subtle transition-all font-label-md text-label-md scale-98" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span>
+                    Timeline
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">psychology</span>
+                    Coaching
+                </a>
+</li>
+</ul>
+<div class="mt-auto pt-4 border-t border-border-soft">
+<ul class="flex flex-col gap-2">
+<li>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+                        Support
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-bg-subtle transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+                        Settings
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-64 w-full">
+<!-- TopAppBar (Mobile/Tablet & Desktop Header) -->
+<header class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-16 bg-background">
+<div class="lg:hidden flex items-center gap-2">
+<div class="w-8 h-8 rounded bg-primary text-on-primary flex items-center justify-center font-bold font-headline-sm text-headline-sm">
+                    GC
+                </div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Gap Check</h1>
+</div>
+<nav class="hidden lg:hidden flex gap-6">
+<a class="font-label-md text-label-md text-on-surface-variant pb-1" href="#">Dashboard</a>
+<a class="font-label-md text-label-md text-secondary border-b-2 border-secondary pb-1" href="#">Resume Versions</a>
+<a class="font-label-md text-label-md text-on-surface-variant pb-1" href="#">Guidance</a>
+</nav>
+<div class="flex items-center gap-4 ml-auto">
+<button class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-border-soft object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-Y06HOWELMpVom4xu-DqUUlsTQvCEBq27rAWQGQ6R9sCtXo73UexHe_ChmW_sRQ1Eh-UlIn-TpUgweMSySER0Xvthx-vC8duWfNHxBuUdb6xxc6Z8FmJ8PERhl6EkQJ8gCoWul4PJYB6WnnNp4x3d4eVB-QShKw1vZUwCqc--6Z-mBG5MkCIvDUdaXBBP8yqKBugqKt1fAGDWIrEWNl2nGqepJXR2QRPKhXrJGw4lH7vPaBXsdvqCfQ"/>
+</div>
+</header>
+<!-- Timeline Content -->
+<div class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto py-8 lg:py-12">
+<div class="mb-12">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">Resume Evolution</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Track your progress as you address skill gaps. Expanding historical versions shows the state of your capabilities at that moment in time.</p>
+</div>
+<div class="relative pl-4 md:pl-0 max-w-3xl">
+<!-- Version 3 (Current) -->
+<div class="relative mb-12 flex gap-6">
+<div class="timeline-line"></div>
+<div class="timeline-node active shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">description</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest border border-border-soft rounded-xl p-card-padding relative">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h3 class="font-headline-sm text-headline-sm text-primary">Version 3 <span class="text-on-surface-variant font-normal">(Current)</span></h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Uploaded Oct 24, 2023 • Product Manager Role</p>
+</div>
+<button class="flex items-center gap-1 text-secondary font-label-md text-label-md hover:bg-bg-subtle py-2 px-3 rounded transition-colors" onclick="toggleExpand('v3-details')">
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+                                View Gaps
+                            </button>
+</div>
+<!-- Delta Chips -->
+<div class="flex flex-wrap gap-2 mb-2">
+<div class="chip chip-positive">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                2 Closed
+                            </div>
+<div class="chip chip-positive">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                                3 Improved
+                            </div>
+<div class="chip chip-neutral">
+<span class="material-symbols-outlined text-[14px]">remove</span>
+                                4 No change
+                            </div>
+</div>
+<!-- Expandable Content -->
+<div class="expandable-content mt-6 pt-6 border-t border-border-soft" id="v3-details">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-4 uppercase tracking-widest">Current Gap Report Snapshot</h4>
+<div class="grid gap-4">
+<!-- Skill Card -->
+<div class="bg-surface-container-lowest border border-border-soft rounded-lg p-4 flex flex-col md:flex-row justify-between md:items-center gap-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-headline-sm text-headline-sm text-primary">Agile Methodologies</span>
+<span class="px-2 py-0.5 rounded-full bg-gap-low text-primary font-label-sm text-label-sm">Owned</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic bg-bg-subtle inline-block px-2 py-1 rounded">"Led cross-functional agile teams..."</p>
+</div>
+<div class="w-full md:w-48">
+<div class="flex text-[10px] text-on-surface-variant justify-between mb-1">
+<span>Aware</span>
+<span>Used</span>
+<span class="font-bold text-primary">Owned</span>
+<span>Led</span>
+</div>
+<div class="flex h-2 gap-1">
+<div class="flex-1 bg-secondary rounded-l-full"></div>
+<div class="flex-1 bg-secondary"></div>
+<div class="flex-1 bg-secondary"></div>
+<div class="flex-1 bg-border-soft rounded-r-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Version 2 -->
+<div class="relative mb-12 flex gap-6">
+<div class="timeline-line"></div>
+<div class="timeline-node flex-shrink-0">
+<span class="material-symbols-outlined text-outline">history</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest border border-border-soft rounded-xl p-card-padding opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h3 class="font-headline-sm text-headline-sm text-primary">Version 2</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Uploaded Sep 12, 2023</p>
+</div>
+<button class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md hover:bg-bg-subtle py-2 px-3 rounded transition-colors" onclick="toggleExpand('v2-details')">
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+                                View Gaps
+                            </button>
+</div>
+<!-- Delta Chips -->
+<div class="flex flex-wrap gap-2 mb-2">
+<div class="chip chip-positive">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                1 Closed
+                            </div>
+<div class="chip chip-neutral">
+<span class="material-symbols-outlined text-[14px]">remove</span>
+                                6 No change
+                            </div>
+<div class="chip chip-negative">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                                1 New Gap
+                            </div>
+</div>
+<!-- Expandable Content (Archived Look) -->
+<div class="expandable-content mt-6 pt-6 border-t border-border-soft grayscale-[50%]" id="v2-details">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-4 uppercase tracking-widest">Historical Snapshot</h4>
+<div class="grid gap-4">
+<div class="bg-surface-container-low border border-border-soft rounded-lg p-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="font-headline-sm text-headline-sm text-primary">Data Analysis</span>
+<span class="px-2 py-0.5 rounded-full bg-gap-high text-on-tertiary-fixed-variant font-label-sm text-label-sm">High Gap</span>
+</div>
+<div class="flex h-2 gap-1 w-full max-w-xs mb-2">
+<div class="flex-1 bg-surface-dim rounded-l-full"></div>
+<div class="flex-1 bg-border-soft"></div>
+<div class="flex-1 bg-border-soft"></div>
+<div class="flex-1 bg-border-soft rounded-r-full"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Mentioned in JD, missing from resume context.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Version 1 (Baseline) -->
+<div class="relative flex gap-6">
+<div class="timeline-node flex-shrink-0">
+<span class="material-symbols-outlined text-outline">flag</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest border border-border-soft rounded-xl p-card-padding opacity-70">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h3 class="font-headline-sm text-headline-sm text-primary">Version 1 <span class="text-on-surface-variant font-normal">(Baseline)</span></h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Uploaded Aug 01, 2023</p>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 italic">Initial upload. No delta available.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        function toggleExpand(id) {
+            const content = document.getElementById(id);
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+            }
+        }
+    </script>
+</body></html>
