@@ -31,18 +31,21 @@ vi.mock("../src/db/client.js", () => ({
   },
 }));
 
-vi.mock("../src/llm/generateSuggestions.js", () => ({
-  generateSuggestions: vi.fn(async () => ({
-    resumeRewrite: "Rewrite: owned the caching layer redesign end-to-end.",
-    portfolioAddition: "Build a small service demonstrating end-to-end ownership.",
+const generateSuggestionsBatch = vi.fn(async (gaps: { skillName: string }[]) => ({
+  suggestions: gaps.map((gap) => ({
+    skillName: gap.skillName,
+    resumeRewrite: `Rewrite for ${gap.skillName}`,
+    portfolioAddition: `Build something for ${gap.skillName}`,
     talkingPointNarrative: {
-      situation: "Team needed a faster cache",
-      task: "Redesign the caching layer",
-      action: "Owned the design and rollout",
-      result: "Cut latency by 40%",
+      situation: `Situation for ${gap.skillName}`,
+      task: `Task for ${gap.skillName}`,
+      action: `Action for ${gap.skillName}`,
+      result: `Result for ${gap.skillName}`,
     },
   })),
 }));
+
+vi.mock("../src/llm/generateSuggestions.js", () => ({ generateSuggestionsBatch }));
 
 const { generateSuggestionsForVersion } = await import("../src/services/suggestions.js");
 
@@ -50,6 +53,7 @@ describe("generateSuggestionsForVersion (tasks 5.4/5.5, improvement-suggestions 
   beforeEach(() => {
     state.gapped = [];
     state.inserted = [];
+    generateSuggestionsBatch.mockClear();
   });
 
   it("generates exactly three suggestions for a skill with a gap", async () => {
@@ -89,5 +93,40 @@ describe("generateSuggestionsForVersion (tasks 5.4/5.5, improvement-suggestions 
     await generateSuggestionsForVersion("v1");
 
     expect(state.inserted).toHaveLength(0);
+    expect(generateSuggestionsBatch).not.toHaveBeenCalled();
+  });
+
+  it("batches multiple gapped skills into a single LLM call and maps results back correctly", async () => {
+    state.gapped = [
+      {
+        skillId: "s1",
+        canonicalName: "Distributed Systems Design",
+        jdDepth: "owned",
+        jdCitation: "designed the caching layer",
+        resumeDepth: "used",
+        resumeCitation: "built the caching layer",
+        gapSize: 1,
+      },
+      {
+        skillId: "s2",
+        canonicalName: "GraphQL",
+        jdDepth: "used",
+        jdCitation: "experience with GraphQL",
+        resumeDepth: "aware",
+        resumeCitation: "familiar with GraphQL",
+        gapSize: 1,
+      },
+    ];
+
+    await generateSuggestionsForVersion("v1");
+
+    expect(generateSuggestionsBatch).toHaveBeenCalledTimes(1);
+    expect(state.inserted).toHaveLength(6);
+    const s1Rows = state.inserted.filter((row) => row.skillId === "s1");
+    const s2Rows = state.inserted.filter((row) => row.skillId === "s2");
+    expect(s1Rows).toHaveLength(3);
+    expect(s2Rows).toHaveLength(3);
+    expect(s1Rows.find((row) => row.type === "resume_rewrite")?.content).toBe("Rewrite for Distributed Systems Design");
+    expect(s2Rows.find((row) => row.type === "resume_rewrite")?.content).toBe("Rewrite for GraphQL");
   });
 });

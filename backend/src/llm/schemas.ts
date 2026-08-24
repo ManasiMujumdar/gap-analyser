@@ -51,16 +51,28 @@ export const resumeEvidenceExtractionSchema = z.object({
 });
 export type ResumeEvidenceExtraction = z.infer<typeof resumeEvidenceExtractionSchema>;
 
-/** Contract 3: growing-taxonomy matching (task 2.1, task 4.2). */
-export const taxonomyMatchSchema = z.object({
-  matchedCanonicalName: z
-    .string()
-    .nullable()
-    .describe(
-      "One of the provided existing canonical skill names if it represents the same underlying competency as the new skill mention, otherwise null to create a new taxonomy entry",
-    ),
+/**
+ * Contract 3: growing-taxonomy matching (task 2.1, task 4.2) - matches every
+ * newly-mentioned skill from one
+ * analysis against the taxonomy in a single LLM call, instead of one call
+ * per skill. Introduced after live testing showed the free-tier Gemini rate
+ * limit (5 req/min) being tripped by the per-skill call pattern once the
+ * taxonomy grew large enough that most skills needed a match check.
+ */
+export const taxonomyMatchBatchSchema = z.object({
+  matches: z.array(
+    z.object({
+      newSkillName: z.string().min(1).describe("Must exactly match one of the provided new skill names"),
+      matchedCanonicalName: z
+        .string()
+        .nullable()
+        .describe(
+          "One of the provided existing canonical skill names if it represents the same underlying competency, otherwise null to create a new taxonomy entry",
+        ),
+    }),
+  ),
 });
-export type TaxonomyMatch = z.infer<typeof taxonomyMatchSchema>;
+export type TaxonomyMatchBatch = z.infer<typeof taxonomyMatchBatchSchema>;
 
 /**
  * Gap scoring "contract" (task 2.1) is deterministic, not LLM-called: a gap
@@ -75,23 +87,33 @@ export interface GapScoreResult {
   gapSize: number;
 }
 
-/** Contract 5: suggestion generation (task 2.1, tasks 5.1-5.3). */
-export const suggestionGenerationSchema = z.object({
-  resumeRewrite: z
-    .string()
-    .min(1)
-    .describe(
-      "Proposed rewritten resume wording that better demonstrates the JD-implied depth, grounded in the existing resume citation when one exists",
-    ),
-  portfolioAddition: z
-    .string()
-    .min(1)
-    .describe("A concrete, scoped project or experience the candidate could pursue to demonstrate the JD-implied depth"),
-  talkingPointNarrative: z.object({
-    situation: z.string().min(1),
-    task: z.string().min(1),
-    action: z.string().min(1),
-    result: z.string().min(1),
-  }),
+/**
+ * Contract 5: suggestion generation (task 2.1, tasks 5.1-5.3) - generates
+ * suggestions for every gapped skill on a resume version in one LLM call,
+ * instead of one call per gap. Same rate-limit motivation as
+ * taxonomyMatchBatchSchema above.
+ */
+export const suggestionGenerationBatchSchema = z.object({
+  suggestions: z.array(
+    z.object({
+      skillName: z.string().min(1).describe("Must exactly match one of the provided skill names"),
+      resumeRewrite: z
+        .string()
+        .min(1)
+        .describe(
+          "Proposed rewritten resume wording that better demonstrates the JD-implied depth, grounded in the existing resume citation when one exists",
+        ),
+      portfolioAddition: z
+        .string()
+        .min(1)
+        .describe("A concrete, scoped project or experience the candidate could pursue to demonstrate the JD-implied depth"),
+      talkingPointNarrative: z.object({
+        situation: z.string().min(1),
+        task: z.string().min(1),
+        action: z.string().min(1),
+        result: z.string().min(1),
+      }),
+    }),
+  ),
 });
-export type SuggestionGeneration = z.infer<typeof suggestionGenerationSchema>;
+export type SuggestionGenerationBatch = z.infer<typeof suggestionGenerationBatchSchema>;

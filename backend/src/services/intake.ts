@@ -2,7 +2,7 @@ import { db } from "../db/client.js";
 import { analyses, jdSkillRequirements, resumeEvidence, resumeVersions } from "../db/schema.js";
 import { extractJdSkills } from "../llm/extractJdSkills.js";
 import { extractResumeEvidence } from "../llm/extractResumeEvidence.js";
-import { resolveSkill } from "./taxonomy.js";
+import { resolveSkillsBatch } from "./taxonomy.js";
 import { computeGapScoresForVersion } from "./gapAnalysis.js";
 import { generateSuggestionsForVersion } from "./suggestions.js";
 
@@ -35,11 +35,8 @@ export async function createAnalysis(jdText: string, resumeText: string) {
 
   const [analysis] = await db.insert(analyses).values({ jdText }).returning();
 
-  const skillIdByName = new Map<string, string>();
-  for (const jdSkill of jdExtraction.skills) {
-    const resolved = await resolveSkill(jdSkill.name);
-    skillIdByName.set(jdSkill.name, resolved.id);
-  }
+  const resolvedByName = await resolveSkillsBatch(jdExtraction.skills.map((s) => s.name));
+  const skillIdByName = new Map([...resolvedByName].map(([name, resolved]) => [name, resolved.id]));
 
   if (jdExtraction.skills.length > 0) {
     await db.insert(jdSkillRequirements).values(

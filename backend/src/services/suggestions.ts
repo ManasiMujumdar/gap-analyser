@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { gapScores, skills, suggestions } from "../db/schema.js";
-import { generateSuggestions } from "../llm/generateSuggestions.js";
+import { generateSuggestionsBatch } from "../llm/generateSuggestions.js";
 
 /**
  * Tasks 5.1-5.5: generates and stores the three suggestion types for every
@@ -26,37 +26,47 @@ export async function generateSuggestionsForVersion(resumeVersionId: string): Pr
     .innerJoin(skills, eq(gapScores.skillId, skills.id))
     .where(eq(gapScores.resumeVersionId, resumeVersionId));
 
-  const rows: (typeof suggestions.$inferInsert)[] = [];
+  const gapsNeedingSuggestions = gapped.filter((gap) => gap.gapSize > 0);
+  if (gapsNeedingSuggestions.length === 0) return;
 
-  for (const gap of gapped) {
-    if (gap.gapSize <= 0) continue;
-
-    const generated = await generateSuggestions({
+  // One LLM call for every gap on this version, not one per gap (rate-limit
+  // motivation - see generateSuggestionsBatch).
+  const generated = await generateSuggestionsBatch(
+    gapsNeedingSuggestions.map((gap) => ({
       skillName: gap.canonicalName,
       jdDepth: gap.jdDepth,
       jdCitation: gap.jdCitation,
       resumeDepth: gap.resumeDepth,
       resumeCitation: gap.resumeCitation,
-    });
+    })),
+  );
+
+  const rows: (typeof suggestions.$inferInsert)[] = [];
+  for (const gap of gapsNeedingSuggestions) {
+    const suggestion = generated.suggestions.find((s) => s.skillName === gap.canonicalName);
+    if (!suggestion) {
+      console.warn(`No batch suggestion returned for skill "${gap.canonicalName}" - skipping.`);
+      continue;
+    }
 
     rows.push(
       {
         resumeVersionId,
         skillId: gap.skillId,
         type: "resume_rewrite",
-        content: generated.resumeRewrite,
+        content: suggestion.resumeRewrite,
       },
       {
         resumeVersionId,
         skillId: gap.skillId,
         type: "portfolio_addition",
-        content: generated.portfolioAddition,
+        content: suggestion.portfolioAddition,
       },
       {
         resumeVersionId,
         skillId: gap.skillId,
         type: "talking_point_narrative",
-        content: JSON.stringify(generated.talkingPointNarrative),
+        content: JSON.stringify(suggestion.talkingPointNarrative),
       },
     );
   }
