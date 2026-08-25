@@ -18,15 +18,25 @@ export async function POST(request: NextRequest) {
     return errorResponse("Both jdText and resumeText are required.", 400);
   }
 
-  const { analysis, resumeVersion } = await createAnalysis(jdText, resumeText);
-  const gapState = await getCurrentGapState(analysis.id);
+  try {
+    const { analysis, resumeVersion } = await createAnalysis(jdText, resumeText);
+    const gapState = await getCurrentGapState(analysis.id);
 
-  return NextResponse.json(
-    {
-      analysisId: analysis.id,
-      resumeVersion,
-      gapScores: gapState.gapScores,
-    },
-    { status: 201 },
-  );
+    return NextResponse.json(
+      {
+        analysisId: analysis.id,
+        resumeVersion,
+        gapScores: gapState.gapScores,
+      },
+      { status: 201 },
+    );
+  } catch (err) {
+    // TEMPORARY diagnostic - reverting once the resume-aware-suggestions
+    // live-verification failure is root-caused.
+    console.error("createAnalysis pipeline failed:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : String(err), stack: err instanceof Error ? err.stack : undefined },
+      { status: 500 },
+    );
+  }
 }
