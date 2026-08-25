@@ -81,7 +81,7 @@ export function SuggestionsPanel({
           {!suggestions && !error && <p className="font-body-md text-body-md text-on-surface-variant">Loading suggestions...</p>}
 
           {rewrite && (
-            <div className="bg-surface rounded-xl p-card-padding border border-border-soft shadow-sm relative overflow-hidden">
+            <div className="bg-surface rounded-xl p-card-padding border border-border-soft shadow-sm relative overflow-hidden shrink-0">
               <div className="absolute top-0 left-0 w-1 h-full bg-success-muted" />
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export function SuggestionsPanel({
           )}
 
           {portfolio && (
-            <div className="bg-surface rounded-xl p-card-padding border border-border-soft shadow-sm relative overflow-hidden">
+            <div className="bg-surface rounded-xl p-card-padding border border-border-soft shadow-sm relative overflow-hidden shrink-0">
               <div className="absolute top-0 left-0 w-1 h-full bg-secondary" />
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-2">
@@ -116,7 +116,7 @@ export function SuggestionsPanel({
           )}
 
           {narrative && typeof narrative.content === "object" && (
-            <div className="bg-surface rounded-xl p-card-padding border border-border-soft shadow-sm relative overflow-hidden">
+            <div className="bg-surface rounded-xl p-card-padding border border-border-soft shadow-sm relative overflow-hidden shrink-0">
               <div className="absolute top-0 left-0 w-1 h-full bg-tertiary-container" />
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-2">
