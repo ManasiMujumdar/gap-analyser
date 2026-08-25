@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
+import { ResumeUploadControl } from "@/components/ResumeUploadControl";
 import { rememberAnalysisId } from "@/lib/analysisStorage";
 
 /** Task 4.4: Start/Upload screen, "add a resume version to an existing analysis" mode. */
@@ -80,9 +81,17 @@ export default function AddVersionPage({ params }: { params: Promise<{ analysisI
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="font-headline-sm text-headline-sm text-primary" htmlFor="resume-text">
-                  Paste your updated resume
-                </label>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <label className="font-headline-sm text-headline-sm text-primary" htmlFor="resume-text">
+                    Paste your updated resume
+                  </label>
+                  <ResumeUploadControl
+                    onExtracted={(text) => {
+                      setResumeText(text);
+                      setError(null);
+                    }}
+                  />
+                </div>
                 <textarea
                   id="resume-text"
                   className="w-full bg-bg-subtle border-none rounded-lg p-4 font-body-md text-body-md text-on-background focus:ring-1 focus:ring-secondary transition-colors resize-y"
