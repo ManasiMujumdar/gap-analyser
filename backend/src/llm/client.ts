@@ -11,12 +11,18 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey);
 
-// Uses Google's "-latest" alias rather than a pinned version, since pinned
-// flash model names (gemini-2.0-flash, then gemini-2.5-flash) both went
-// stale/inaccessible within the same week this was built. The alias always
-// points to whatever Google currently recommends, avoiding that churn.
-// Override via GEMINI_MODEL if needed.
-const MODEL = process.env.GEMINI_MODEL ?? "gemini-flash-latest";
+// Pinned to a specific "flash-lite" model rather than the "gemini-flash-latest"
+// alias. The alias seemed like the right call to dodge deprecation churn,
+// but backfired: it silently drifted from gemini-3.6-flash to gemini-3.7-flash
+// within the same day, and whatever it points to shares one 20-req/day
+// free-tier quota bucket with every other alias user - a ceiling hit purely
+// from normal testing. Flash-lite tiers get a more generous free allowance,
+// and a specific model name has its own separate quota bucket untouched by
+// the alias's usage. This will eventually need updating by hand when this
+// specific model is deprecated (that's the deliberate tradeoff - a known,
+// stable quota beats an alias with an invisible/shifting one). Override via
+// GEMINI_MODEL if needed.
+const MODEL = process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite";
 
 /** Parses the RetryInfo.retryDelay (e.g. "23s") Gemini includes on 429 responses, if present. */
 function parseRetryDelaySeconds(err: GoogleGenerativeAIFetchError): number | null {
