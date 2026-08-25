@@ -2,9 +2,32 @@ import { db } from "../db/client.js";
 import { analyses, jdSkillRequirements, resumeEvidence, resumeVersions } from "../db/schema.js";
 import { extractJdSkills } from "../llm/extractJdSkills.js";
 import { extractResumeEvidence } from "../llm/extractResumeEvidence.js";
+import { DEPTH_ORDINAL, type DepthLevel } from "../llm/schemas.js";
 import { resolveSkillsBatch } from "./taxonomy.js";
 import { computeGapScoresForVersion } from "./gapAnalysis.js";
 import { generateSuggestionsForVersion } from "./suggestions.js";
+
+/**
+ * The taxonomy matcher can resolve two distinct extracted names (e.g. "A/B
+ * Testing" and "Experimentation Design") to the same canonical skill, which
+ * would otherwise produce two rows sharing the same (parentId, skillId) pair
+ * and violate that table's unique constraint. Collapse to one row per
+ * skillId, keeping the entry with the highest rubric depth.
+ */
+function dedupeByHighestDepth<T extends { depth: DepthLevel }>(
+  items: T[],
+  skillIdFor: (item: T) => string,
+): T[] {
+  const bySkillId = new Map<string, T>();
+  for (const item of items) {
+    const skillId = skillIdFor(item);
+    const existing = bySkillId.get(skillId);
+    if (!existing || DEPTH_ORDINAL[item.depth] > DEPTH_ORDINAL[existing.depth]) {
+      bySkillId.set(skillId, item);
+    }
+  }
+  return [...bySkillId.values()];
+}
 
 /**
  * Task 3.1/3.2: submits a job description and extracts its per-skill
@@ -47,9 +70,10 @@ export async function createAnalysis(jdText: string, resumeText: string) {
   ]);
   const skillIdByName = new Map([...resolvedByName].map(([name, resolved]) => [name, resolved.id]));
 
-  if (jdExtraction.skills.length > 0) {
+  const dedupedJdSkills = dedupeByHighestDepth(jdExtraction.skills, (s) => skillIdByName.get(s.name)!);
+  if (dedupedJdSkills.length > 0) {
     await db.insert(jdSkillRequirements).values(
-      jdExtraction.skills.map((jdSkill) => ({
+      dedupedJdSkills.map((jdSkill) => ({
         analysisId: analysis.id,
         skillId: skillIdByName.get(jdSkill.name)!,
         jdDepth: jdSkill.depth,
@@ -63,14 +87,16 @@ export async function createAnalysis(jdText: string, resumeText: string) {
     .values({ analysisId: analysis.id, versionNumber: 1, resumeText })
     .returning();
 
-  const evidenceRows = resumeExtraction.evidence
-    .filter((item) => skillIdByName.has(item.skillName))
-    .map((item) => ({
-      resumeVersionId: version.id,
-      skillId: skillIdByName.get(item.skillName)!,
-      evidenceDepth: item.depth,
-      evidenceCitation: item.citation,
-    }));
+  const dedupedEvidence = dedupeByHighestDepth(
+    resumeExtraction.evidence.filter((item) => skillIdByName.has(item.skillName)),
+    (item) => skillIdByName.get(item.skillName)!,
+  );
+  const evidenceRows = dedupedEvidence.map((item) => ({
+    resumeVersionId: version.id,
+    skillId: skillIdByName.get(item.skillName)!,
+    evidenceDepth: item.depth,
+    evidenceCitation: item.citation,
+  }));
   if (evidenceRows.length > 0) {
     await db.insert(resumeEvidence).values(evidenceRows);
   }
