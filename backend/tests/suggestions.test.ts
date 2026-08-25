@@ -31,19 +31,21 @@ vi.mock("../src/db/client.js", () => ({
   },
 }));
 
-const generateSuggestionsBatch = vi.fn(async (gaps: { skillName: string }[]) => ({
-  suggestions: gaps.map((gap) => ({
-    skillName: gap.skillName,
-    resumeRewrite: `Rewrite for ${gap.skillName}`,
-    portfolioAddition: `Build something for ${gap.skillName}`,
-    talkingPointNarrative: {
-      situation: `Situation for ${gap.skillName}`,
-      task: `Task for ${gap.skillName}`,
-      action: `Action for ${gap.skillName}`,
-      result: `Result for ${gap.skillName}`,
-    },
-  })),
-}));
+const generateSuggestionsBatch = vi.fn(
+  async (gaps: { skillName: string }[], _demonstratedSkillset: { skillName: string }[] = []) => ({
+    suggestions: gaps.map((gap) => ({
+      skillName: gap.skillName,
+      resumeRewrite: `Rewrite for ${gap.skillName}`,
+      portfolioAddition: `Build something for ${gap.skillName}`,
+      talkingPointNarrative: {
+        situation: `Situation for ${gap.skillName}`,
+        task: `Task for ${gap.skillName}`,
+        action: `Action for ${gap.skillName}`,
+        result: `Result for ${gap.skillName}`,
+      },
+    })),
+  }),
+);
 
 vi.mock("../src/llm/generateSuggestions.js", () => ({ generateSuggestionsBatch }));
 
@@ -128,5 +130,53 @@ describe("generateSuggestionsForVersion (tasks 5.4/5.5, improvement-suggestions 
     expect(s2Rows).toHaveLength(3);
     expect(s1Rows.find((row) => row.type === "resume_rewrite")?.content).toBe("Rewrite for Distributed Systems Design");
     expect(s2Rows.find((row) => row.type === "resume_rewrite")?.content).toBe("Rewrite for GraphQL");
+  });
+
+  it("passes the candidate's demonstrated skillset (other skills with evidence) to the batch call (resume-aware-suggestions spec)", async () => {
+    state.gapped = [
+      {
+        skillId: "s1",
+        canonicalName: "Budget Management",
+        jdDepth: "owned",
+        jdCitation: "owned campaign budgets",
+        resumeDepth: null,
+        resumeCitation: null,
+        gapSize: 3,
+      },
+      {
+        skillId: "s2",
+        canonicalName: "SQL",
+        jdDepth: "used",
+        jdCitation: "experience with SQL",
+        resumeDepth: "owned",
+        resumeCitation: "owned the SQL reporting pipeline",
+        gapSize: 0,
+      },
+    ];
+
+    await generateSuggestionsForVersion("v1");
+
+    const [, demonstratedSkillset] = generateSuggestionsBatch.mock.calls[0];
+    expect(demonstratedSkillset).toEqual([{ skillName: "SQL", depth: "owned", citation: "owned the SQL reporting pipeline" }]);
+  });
+
+  it("passes an empty demonstrated skillset when no other skill has any evidence (graceful degradation)", async () => {
+    state.gapped = [
+      {
+        skillId: "s1",
+        canonicalName: "Budget Management",
+        jdDepth: "owned",
+        jdCitation: "owned campaign budgets",
+        resumeDepth: null,
+        resumeCitation: null,
+        gapSize: 3,
+      },
+    ];
+
+    await generateSuggestionsForVersion("v1");
+
+    const [, demonstratedSkillset] = generateSuggestionsBatch.mock.calls[0];
+    expect(demonstratedSkillset).toEqual([]);
+    expect(state.inserted).toHaveLength(3);
   });
 });

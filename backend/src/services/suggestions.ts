@@ -29,6 +29,20 @@ export async function generateSuggestionsForVersion(resumeVersionId: string): Pr
   const gapsNeedingSuggestions = gapped.filter((gap) => gap.gapSize > 0);
   if (gapsNeedingSuggestions.length === 0) return;
 
+  // Task 1.1-1.3: every skill on this version with resume evidence, so
+  // suggestions can be grounded in what the candidate has already
+  // demonstrated elsewhere, not only the gapped skill itself
+  // (resume-aware-suggestions spec: "Suggestion generation includes the
+  // candidate's full demonstrated skillset"). Naturally empty on a first
+  // version with little evidence yet - no special-casing needed.
+  const demonstratedSkillset = gapped
+    .filter((skill) => skill.resumeDepth !== null && skill.resumeCitation !== null)
+    .map((skill) => ({
+      skillName: skill.canonicalName,
+      depth: skill.resumeDepth!,
+      citation: skill.resumeCitation!,
+    }));
+
   // One LLM call for every gap on this version, not one per gap (rate-limit
   // motivation - see generateSuggestionsBatch).
   const generated = await generateSuggestionsBatch(
@@ -39,6 +53,7 @@ export async function generateSuggestionsForVersion(resumeVersionId: string): Pr
       resumeDepth: gap.resumeDepth,
       resumeCitation: gap.resumeCitation,
     })),
+    demonstratedSkillset,
   );
 
   const rows: (typeof suggestions.$inferInsert)[] = [];
