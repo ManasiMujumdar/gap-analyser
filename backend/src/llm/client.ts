@@ -34,25 +34,31 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Transient failure modes worth retrying: 429 (free-tier's low 5 RPM cap,
+// easily hit by a single analysis's several sequential LLM calls) and 503
+// (Gemini reporting temporary capacity overload - observed in production:
+// "This model is currently experiencing high demand... usually temporary").
+// Not retried: anything else (4xx client errors, genuine failures) - those
+// should surface immediately rather than be masked by a slow retry loop.
+const RETRYABLE_STATUS_CODES = new Set([429, 503]);
+
 /**
- * Gemini's free tier has a low requests-per-minute cap (5 RPM as observed),
- * easily hit by a single analysis's several sequential LLM calls (JD
- * extraction, resume extraction, one taxonomy match per skill, one
- * suggestion-generation call per gap). Retries on 429 with the server's
- * suggested delay when provided, else exponential backoff, up to 5 attempts.
+ * Retries a Gemini call on a retryable transient error, using the server's
+ * suggested delay when provided (429 responses include one), else
+ * exponential backoff, up to 5 attempts.
  */
-async function withRateLimitRetry<T>(fn: () => Promise<T>): Promise<T> {
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   const maxAttempts = 5;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn();
     } catch (err) {
-      const isRateLimit = err instanceof GoogleGenerativeAIFetchError && err.status === 429;
-      if (!isRateLimit || attempt === maxAttempts) throw err;
+      const isRetryable = err instanceof GoogleGenerativeAIFetchError && err.status !== undefined && RETRYABLE_STATUS_CODES.has(err.status);
+      if (!isRetryable || attempt === maxAttempts) throw err;
 
       const suggested = parseRetryDelaySeconds(err);
       const waitSeconds = suggested ?? 2 ** attempt;
-      console.warn(`Rate limited (attempt ${attempt}/${maxAttempts}), waiting ${waitSeconds}s before retry...`);
+      console.warn(`Retryable error (status ${(err as GoogleGenerativeAIFetchError).status}, attempt ${attempt}/${maxAttempts}), waiting ${waitSeconds}s before retry...`);
       await sleep(waitSeconds * 1000);
     }
   }
@@ -117,7 +123,7 @@ export async function callStructured<T>(params: {
     },
   });
 
-  const result = await withRateLimitRetry(() => model.generateContent(prompt));
+  const result = await withRetry(() => model.generateContent(prompt));
   const text = result.response.text();
 
   let parsed: unknown;
