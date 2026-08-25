@@ -4,7 +4,7 @@ import { errorResponse } from "@/lib/api-errors";
 
 // Resume extraction + a batched suggestion-generation call can take longer
 // than the default serverless timeout - see app/api/analyses/route.ts.
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 /** Task 3.2: POST /api/analyses/[analysisId]/versions - adds a new resume version and returns its delta. */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ analysisId: string }> }) {

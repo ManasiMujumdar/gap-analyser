@@ -32,10 +32,19 @@ export async function submitResume(resumeText: string, targetSkillNames: string[
  */
 export async function createAnalysis(jdText: string, resumeText: string) {
   const jdExtraction = await submitJobDescription(jdText);
+  const targetSkillNames = jdExtraction.skills.map((s) => s.name);
 
   const [analysis] = await db.insert(analyses).values({ jdText }).returning();
 
-  const resolvedByName = await resolveSkillsBatch(jdExtraction.skills.map((s) => s.name));
+  // Taxonomy matching and resume-evidence extraction both only depend on
+  // jdExtraction's skill names, not on each other, so they run concurrently
+  // rather than sequentially - meaningfully cuts wall-clock time (and means
+  // a rate-limit retry on one doesn't block the other), which matters given
+  // Vercel's serverless function timeout on this route.
+  const [resolvedByName, resumeExtraction] = await Promise.all([
+    resolveSkillsBatch(targetSkillNames),
+    submitResume(resumeText, targetSkillNames),
+  ]);
   const skillIdByName = new Map([...resolvedByName].map(([name, resolved]) => [name, resolved.id]));
 
   if (jdExtraction.skills.length > 0) {
@@ -53,8 +62,6 @@ export async function createAnalysis(jdText: string, resumeText: string) {
     .insert(resumeVersions)
     .values({ analysisId: analysis.id, versionNumber: 1, resumeText })
     .returning();
-
-  const resumeExtraction = await submitResume(resumeText, [...skillIdByName.keys()]);
 
   const evidenceRows = resumeExtraction.evidence
     .filter((item) => skillIdByName.has(item.skillName))

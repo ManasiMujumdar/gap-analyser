@@ -44,11 +44,16 @@ const RETRYABLE_STATUS_CODES = new Set([429, 503]);
 
 /**
  * Retries a Gemini call on a retryable transient error, using the server's
- * suggested delay when provided (429 responses include one), else
- * exponential backoff, up to 5 attempts.
+ * suggested delay when provided (429 responses include one, capped so a
+ * single call can't consume the whole request's time budget), else
+ * exponential backoff, up to 3 attempts. Kept deliberately tight (rather
+ * than a more patient/generous retry policy) because this runs inside a
+ * request with several sequential LLM calls, all sharing one serverless
+ * function timeout.
  */
 async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
-  const maxAttempts = 5;
+  const maxAttempts = 3;
+  const maxWaitSeconds = 10;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn();
@@ -57,7 +62,7 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
       if (!isRetryable || attempt === maxAttempts) throw err;
 
       const suggested = parseRetryDelaySeconds(err);
-      const waitSeconds = suggested ?? 2 ** attempt;
+      const waitSeconds = Math.min(suggested ?? 2 ** attempt, maxWaitSeconds);
       console.warn(`Retryable error (status ${(err as GoogleGenerativeAIFetchError).status}, attempt ${attempt}/${maxAttempts}), waiting ${waitSeconds}s before retry...`);
       await sleep(waitSeconds * 1000);
     }

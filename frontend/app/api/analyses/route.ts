@@ -6,7 +6,7 @@ import { errorResponse } from "@/lib/api-errors";
 // Several sequential LLM calls happen per request (JD extraction, one
 // batched taxonomy-match call, resume extraction, one batched
 // suggestion-generation call) - default serverless timeouts are too short.
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 /** Task 3.1: POST /api/analyses - creates a new analysis and returns its initial gap state. */
 export async function POST(request: NextRequest) {
