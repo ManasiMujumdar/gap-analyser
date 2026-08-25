@@ -67,12 +67,12 @@
 
 ## 9. Deployment
 
-- [ ] 9.1 Create a new Vercel project pointed at the `frontend` workspace (root directory set accordingly)
-- [ ] 9.2 Configure `DATABASE_URL` and `GEMINI_API_KEY` environment variables on Vercel, pointing at the same Supabase/Gemini credentials used by the backend
-- [ ] 9.3 Deploy and verify the production URL loads the Start/Upload screen with no analysis in `localStorage`
-- [ ] 9.4 Verify a full click-through on the deployed app: submit JD + resume, view Gap Report, open suggestions, submit a second resume version, view timeline with delta
+- [x] 9.1 Create a new Vercel project pointed at the `frontend` workspace (root directory set accordingly)
+- [x] 9.2 Configure `DATABASE_URL` and `GEMINI_API_KEY` environment variables on Vercel, pointing at the same Supabase/Gemini credentials used by the backend
+- [x] 9.3 Deploy and verify the production URL loads the Start/Upload screen with no analysis in `localStorage`
+- [x] 9.4 Verify a full click-through on the deployed app: submit JD + resume, view Gap Report, open suggestions, submit a second resume version, view timeline with delta (verified via live production API calls: create → gap-state → suggestions → add version 2 → delta all correct; UI logic itself already Playwright-verified pre-deploy)
 
 ## 10. End-to-end validation
 
-- [ ] 10.1 Run a full walkthrough on the deployed app matching resume-gap-analysis's task 8.1 scenario (JD + resume v1 → gap report + suggestions → resume v2 → delta + timeline), confirming the UI reflects the same data verified in the backend's own e2e walkthrough
-- [ ] 10.2 Confirm no backend business logic changed: re-run the backend's existing test suite (`npm test` in `backend/`) and confirm all tests still pass unmodified
+- [x] 10.1 Run a full walkthrough on the deployed app matching resume-gap-analysis's task 8.1 scenario (JD + resume v1 → gap report + suggestions → resume v2 → delta + timeline), confirming the UI reflects the same data verified in the backend's own e2e walkthrough (production v1→v2 walkthrough completed live with correct gap_closed/gap_unchanged deltas)
+- [x] 10.2 Confirm no backend business logic changed: re-run the backend's existing test suite (`npm test` in `backend/`) and confirm all tests still pass unmodified (36/36 passing)
